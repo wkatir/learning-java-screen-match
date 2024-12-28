@@ -1,5 +1,8 @@
 package com.aluracursos.screenmatch.modelos;
 
+import com.aluracursos.screenmatch.exception.ErrorEnConversionDeDuracionException;
+import com.google.gson.annotations.SerializedName;
+
 public class Titulo implements Comparable<Titulo> {
     private String nombre;
     private int fechaDeLanzamiento;
@@ -12,6 +15,16 @@ public class Titulo implements Comparable<Titulo> {
         this.nombre = nombre;
         this.fechaDeLanzamiento = fechaDeLanzamiento;
     }
+
+    public Titulo(TituloOmdb miTituloOmdb) {
+        this.nombre = miTituloOmdb.title();
+        this.fechaDeLanzamiento = Integer.valueOf(miTituloOmdb.year());
+        if (miTituloOmdb.runtime().contains("N/A")) {
+            throw new ErrorEnConversionDeDuracionException("No pude convertir la duracion" + "porque contiene un N/A");
+        }
+        this.duracionEnMinutos = Integer.valueOf(miTituloOmdb.runtime().substring(0, 3).replace(" ", ""));
+    }
+
 
     public String getNombre() {
         return nombre;
@@ -45,27 +58,33 @@ public class Titulo implements Comparable<Titulo> {
         this.incluidoEnElPlan = incluidoEnElPlan;
     }
 
-    public int getTotalDelasEvaluaciones(){
+    public int getTotalDelasEvaluaciones() {
         return totalDelasEvaluaciones;
     }
 
-    public void muestraFichaTecnica(){
+    public void muestraFichaTecnica() {
         System.out.println("El nombre de la película es: " + nombre);
         System.out.println("Su fecha de lanzamiento es: " + fechaDeLanzamiento);
-        System.out.println("Duración en minutos: "+ getDuracionEnMinutos());
+        System.out.println("Duración en minutos: " + getDuracionEnMinutos());
     }
 
-    public void evalua(double nota){
+    public void evalua(double nota) {
         sumaDeLasEvaluaciones += nota;
         totalDelasEvaluaciones++;
     }
 
-    public double calculaMedia(){
+    public double calculaMedia() {
         return sumaDeLasEvaluaciones / totalDelasEvaluaciones;
     }
 
     @Override
     public int compareTo(Titulo otroTitulo) {
         return this.getNombre().compareTo(otroTitulo.getNombre());
+    }
+
+    @Override
+    public String toString() {
+        return "(nombre=" + nombre + '\'' +
+                ", fechaDeLanzamiento=" + fechaDeLanzamiento + ", duracion=" + duracionEnMinutos + ")";
     }
 }
